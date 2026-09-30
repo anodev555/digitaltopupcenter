@@ -1,0 +1,1 @@
+ALTER TABLE "packages" RENAME COLUMN "display_name" TO "game_currency_name";

@@ -1,0 +1,1 @@
+ALTER TABLE "games_list" ALTER COLUMN "game_code" SET NOT NULL;
