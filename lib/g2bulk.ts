@@ -16,6 +16,7 @@ export type GamesType = {
   games: gamesItem[];
 };
 
+//fetch all direct-topup games
 export async function listGames(): Promise<GamesType> {
   return (await api.get("/games")).data;
 }

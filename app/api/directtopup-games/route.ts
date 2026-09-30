@@ -1,38 +1,35 @@
 import { NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { db } from "@/db";
-import {
-  gamesItem,
-  getCatalogue,
-  getFields,
-  getServers,
-  listGames,
-} from "@/lib/g2bulk";
-import { games, gameslist, packages } from "@/db/schema";
-import { Server } from "http";
+import { getCatalogue, getFields, getServers, listGames } from "@/lib/g2bulk";
+import { games, packages } from "@/db/schema";
+import { sql, eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
+const toTextArray = (a: string[]) =>
+  a.length
+    ? sql`ARRAY[${sql.join(
+        a.map((v) => sql`${v}`),
+        sql`, `,
+      )}]::text[]`
+    : sql`ARRAY[]::text[]`;
 
-// TODO: protect with admin auth (login + role check) before going live.
-// POST /api/loadgames -- sync G2Bulk catalog into games + packages.
-// New rows arrive inactive; your is_active / sell_price_npr / sort_order
-// are never overwritten by the sync.
 export async function POST() {
   try {
-    const allowedGames = await db
-      .select({
-        gameCode: gameslist.gameCode,
-      })
-      .from(gameslist);
+    // const allowedGames = await db
+    //   .select({
+    //     gameCode: gameslist.gameCode,
+    //   })
+    //   .from(gameslist);
     // console.log(allowedGames);
-    const TargetGames = allowedGames.map((item) => item.gameCode);
+    // const TargetGames = allowedGames.map((item) => item.gameCode);
     const allGames = await listGames();
-    const AllowedGames: gamesItem[] = allGames.games.filter((item) =>
-      TargetGames.includes(item.code),
-    );
-    console.log(AllowedGames);
+    // const AllowedGames: gamesItem[] = allGames.games.filter((item) =>
+    //   TargetGames.includes(item.code),
+    // );
+    // console.log(AllowedGames);
 
-    if (!AllowedGames || AllowedGames.length === 0) {
+    if (!allGames.games || allGames.games.length === 0) {
       return NextResponse.json(
         {
           error: "No games found from G2bulk",
@@ -45,7 +42,7 @@ export async function POST() {
 
     const failed: string[] = [];
     let synced = 0;
-    for (const g of AllowedGames) {
+    for (const g of allGames.games) {
       try {
         const [Fields, Servers, Catalogues] = await Promise.all([
           getFields(g.code),
@@ -58,7 +55,7 @@ export async function POST() {
           : ["userid"];
         const servers = Servers ? Object.keys(Servers?.servers) : [];
 
-        const [Game] = await db
+        await db
           .insert(games)
           .values({
             g2bulkCode: g.code,
@@ -76,10 +73,19 @@ export async function POST() {
               servers: servers,
               updatedAt: new Date(),
             },
-          })
-          .returning({
-            id: games.id,
+            setWhere: sql`
+            ${games.name} IS DISTINCT FROM ${g.name}
+            OR ${games.imageUrl} IS DISTINCT FROM ${g.image_url}
+           OR ${games.requiredFields} IS DISTINCT FROM ${toTextArray(fields)}
+  OR ${games.servers} IS DISTINCT FROM ${toTextArray(servers)}`,
           });
+
+        const [Game] = await db
+          .select({
+            id: games.id,
+          })
+          .from(games)
+          .where(eq(games.g2bulkCode, g.code));
 
         //catalogues
         const cataloueItems = Catalogues.catalogues ?? [];
@@ -101,6 +107,10 @@ export async function POST() {
                 costPriceUsd: amount,
                 available: true,
               },
+              setWhere: sql`
+              ${packages.costPriceUsd} IS DISTINCT FROM ${amount}::numeric
+              
+              `,
             });
         }
         synced++;
@@ -110,7 +120,7 @@ export async function POST() {
         console.error(`loadgames: skipped ${g.code}`, e);
       }
     }
-
+    console.log({ synced, failed });
     return NextResponse.json({ synced, failed });
   } catch (error) {
     console.log(error);
@@ -123,7 +133,7 @@ export async function POST() {
 
     return NextResponse.json(
       {
-        error: `${error instanceof Error ? `${error.message}` : "Failed to sync or load games"}`,
+        error: "Failed to sync or load games",
       },
       { status: 500 },
     );
