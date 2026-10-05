@@ -136,7 +136,6 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
 
-    /* Ambient glow + starfield */
     background-image:
       radial-gradient(
         ellipse 70% 42% at 88% -6%,
@@ -202,6 +201,9 @@
   h6 {
     font-family: var(--font-primary);
   }
+  button {
+    @apply cursor-pointer!;
+  }
 }
 
 @layer utilities {
@@ -211,5 +213,23 @@
   .btn-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary/90;
     transition: all 0.5s ease;
+  }
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--marquee-gap)));
+  }
+}
+
+@keyframes marquee-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--marquee-gap)));
   }
 }

@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ThemeScript } from "@/components/providers/theme-script";
+import { themeConfig } from "@/lib/theme";
 
 // Primary — display / headings
 const orbitron = Orbitron({
@@ -32,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      /* next-themes writes the theme class on <html> before hydration */
+      /* the theme script writes the class on <html> before hydration */
       suppressHydrationWarning
       className={cn(
         "h-full",
@@ -43,13 +45,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         "font-sans",
       )}
     >
+      <head>
+        {/*
+          Server rendered on purpose: a <script> produced while rendering on
+          the client never runs, and React logs "Encountered a script tag while
+          rendering React component". This one applies the stored theme before
+          the first paint, which a client provider could never guarantee.
+        */}
+        <ThemeScript {...themeConfig} />
+      </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider {...themeConfig} disableTransitionOnChange>
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster richColors position="top-right" />
         </ThemeProvider>

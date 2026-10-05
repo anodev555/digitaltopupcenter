@@ -12,7 +12,7 @@ import {
   SunMoon,
   X,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/theme-provider";
 
 import AppLogo from "@/components/shared/app-logo";
 import { Badge } from "@/components/ui/badge";
@@ -140,7 +140,7 @@ export function MobileMenu({
         </div>
 
         <div className="space-y-2 border-t p-3">
-          {/* <ToggleGroup
+          <ToggleGroup
             type="single"
             value={theme}
             onValueChange={(v) => v && setTheme(v)}
@@ -170,7 +170,7 @@ export function MobileMenu({
                 {label}
               </ToggleGroupItem>
             ))}
-          </ToggleGroup> */}
+          </ToggleGroup>
 
           <div className="rounded-2xl border bg-card p-3.5">
             <p className="text-sm leading-relaxed text-muted-foreground">

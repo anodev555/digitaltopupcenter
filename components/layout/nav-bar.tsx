@@ -7,7 +7,7 @@ import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/layout/mobile-menu";
 import AppLogo from "@/components/shared/app-logo";
-import { BRAND, BRAND_SHORT, isActivePath, mainNav } from "@/lib/nav";
+import { BRAND_SHORT, isActivePath, mainNav } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import SearchBar from "@/components/shared/search-bar";
 
@@ -15,12 +15,21 @@ function Brand() {
   return <AppLogo href="/" size="sm" title={<span>{BRAND_SHORT}</span>} />;
 }
 
+const SHINE =
+  "linear-gradient(115deg, transparent 0 30%, rgba(255,255,255,.14) 45% 0%, transparent 40% 70%, rgba(255,255,255,.1) 83% 0%, transparent 80%)";
+
 export default function NavBar() {
   const pathname = usePathname();
   const isActive = (href: string) => isActivePath(pathname, href);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-1"
+        style={{ backgroundImage: SHINE }}
+      />
+
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Brand />
 
