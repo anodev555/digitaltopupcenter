@@ -560,3 +560,13 @@ Most money is lost through double top-ups and trusting the browser, so these rul
 - [ ] Add eSewa, then bank payments
 
 Open question: does `GET /v1/orders/:id` return direct top-up orders? If not, ask G2Bulk support how to check a top-up's status, and rely on the webhook plus `NEEDS_REVIEW`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

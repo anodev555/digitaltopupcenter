@@ -449,7 +449,7 @@ function renderTrigger(trigger: SearchBarTrigger, label: string) {
   return (
     <button
       type="button"
-      className="flex h-10 w-full max-w-md items-center gap-2 rounded-lg border border-input bg-transparent px-3 text-sm text-muted-foreground smooth hover:bg-accent hover:text-foreground sm:w-64"
+      className="flex h-10 w-full max-w-auto items-center gap-2 rounded-lg border-2 border-primary/50 bg-background px-3 text-sm text-muted-foreground smooth hover:bg-accent hover:text-foreground sm:w-96"
     >
       <Search size={16} aria-hidden />
       <span className="truncate">{label}</span>
